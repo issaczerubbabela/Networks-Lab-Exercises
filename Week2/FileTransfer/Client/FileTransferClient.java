@@ -65,7 +65,9 @@ public class FileTransferClient extends JFrame {
             byte[] buffer = new byte[4 * 1024];
             int bytes;
             while ((bytes = fileInputStream.read(buffer)) != -1) {
-                dataOutputStream.write(buffer, 0, bytes);
+                // Encrypt the buffer before sending
+                byte[] encryptedBuffer = CaesarCipher.encrypt(buffer, bytes);
+                dataOutputStream.write(encryptedBuffer, 0, bytes);
             }
 
             JOptionPane.showMessageDialog(null, "File sent successfully.");
@@ -82,5 +84,17 @@ public class FileTransferClient extends JFrame {
                 new FileTransferClient().setVisible(true);
             }
         });
+    }
+}
+
+class CaesarCipher {
+    private static final int SHIFT = 3; // You can change the shift value
+
+    public static byte[] encrypt(byte[] data, int length) {
+        byte[] encrypted = new byte[length];
+        for (int i = 0; i < length; i++) {
+            encrypted[i] = (byte) (data[i] + SHIFT);
+        }
+        return encrypted;
     }
 }
