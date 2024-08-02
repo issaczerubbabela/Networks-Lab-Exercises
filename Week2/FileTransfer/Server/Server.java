@@ -1,6 +1,8 @@
-import java.net.*;
-import java.io.*;
-import java.util.*;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.FileOutputStream;
+import java.net.ServerSocket;
+import java.net.Socket;
 
 public class Server {
     private static DataOutputStream out = null;
@@ -13,7 +15,7 @@ public class Server {
             System.out.println("connected");
             in = new DataInputStream(clientSocket.getInputStream());
             out = new DataOutputStream(clientSocket.getOutputStream());
-            receiveFile("NewFile.pdf");
+            receiveFile("received.txt");
 
             in.close();
             out.close();
@@ -33,7 +35,7 @@ public class Server {
             size -= bytes;
         }
         System.out.println("File is Received");
-        out.close();
+        fileout.close();
     }
 
 }

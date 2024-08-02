@@ -1,9 +1,10 @@
-
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.net.*;
+import java.io.*;
+import java.net.Socket;
 
 public class Client {
     private static DataOutputStream out = null;
@@ -14,9 +15,9 @@ public class Client {
             in = new DataInputStream(Client.getInputStream());
             out = new DataOutputStream(Client.getOutputStream());
             System.out.println("Sending file to server");
-            sendFile("Z:\\Networks\\FileTransfer\\NewFile.txt");
+            sendFile("Z:\\Networks-Lab-Exercises\\Week2\\FileTransfer\\Client\\NewFile.txt");
             in.close();
-            out.close();
+            in.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
