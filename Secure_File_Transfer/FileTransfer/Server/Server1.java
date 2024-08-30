@@ -1,61 +1,55 @@
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.FileOutputStream;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 
 public class Server1 {
-
     private static DataOutputStream dataOutputStream = null;
     private static DataInputStream dataInputStream = null;
 
     public static void main(String[] args) {
-        // Here we define Server Socket running on port 900
         try (ServerSocket serverSocket = new ServerSocket(900)) {
-            System.out.println("Server is Starting in Port 900");
-            // Accept the Client request using accept method
-            Socket clientSocket = serverSocket.accept();
-            System.out.println("Connected");
-            dataInputStream = new DataInputStream(clientSocket.getInputStream());
-            dataOutputStream = new DataOutputStream(clientSocket.getOutputStream());
-            // Here we call receiveFile define new for that file
-            receiveFile("NewFile1.txt");
+            System.out.println("Server is listening on port 900");
 
-            dataInputStream.close();
-            dataOutputStream.close();
-            clientSocket.close();
-        } catch (Exception e) {
+            while (true) {
+                Socket socket = serverSocket.accept();
+                System.out.println("Client connected");
+
+                dataInputStream = new DataInputStream(socket.getInputStream());
+                dataOutputStream = new DataOutputStream(socket.getOutputStream());
+
+                // Read file name and file size from the client
+                String fileName = dataInputStream.readUTF();
+                long fileSize = dataInputStream.readLong();
+
+                // Create a new file in the server directory
+                File file = new File(fileName);
+                FileOutputStream fileOutputStream = new FileOutputStream(file);
+
+                // Read file content from the client and write to the file
+                byte[] buffer = new byte[4096];
+                int bytesRead;
+                long totalBytesRead = 0;
+                while (totalBytesRead < fileSize && (bytesRead = dataInputStream.read(buffer)) != -1) {
+                    fileOutputStream.write(buffer, 0, bytesRead);
+                    totalBytesRead += bytesRead;
+                }
+
+                fileOutputStream.close();
+                System.out.println("File received from the client.");
+
+                socket.close();
+            }
+        } catch (IOException e) {
             e.printStackTrace();
+        } finally {
+            try {
+                if (dataInputStream != null)
+                    dataInputStream.close();
+                if (dataOutputStream != null)
+                    dataOutputStream.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
-    }
-
-    // receive file function is start here
-    private static void receiveFile(String fileName) throws Exception {
-        int bytes = 0;
-        FileOutputStream fileOutputStream = new FileOutputStream(fileName);
-
-        long size = dataInputStream.readLong(); // read file size
-        byte[] buffer = new byte[4 * 1024];
-        while (size > 0 && (bytes = dataInputStream.read(buffer, 0, (int) Math.min(buffer.length, size))) != -1) {
-            // Decrypt the buffer before writing to file
-            byte[] decryptedBuffer = CaesarCipher.decrypt(buffer, bytes);
-            fileOutputStream.write(decryptedBuffer, 0, bytes);
-            size -= bytes; // read up to file size
-        }
-        // Here we received file
-        System.out.println("File is Received");
-        fileOutputStream.close();
-    }
-}
-
-class CaesarCipher {
-    private static final int SHIFT = 3; // You can change the shift value
-
-    public static byte[] decrypt(byte[] data, int length) {
-        byte[] decrypted = new byte[length];
-        for (int i = 0; i < length; i++) {
-            decrypted[i] = (byte) (data[i] - SHIFT);
-        }
-        return decrypted;
     }
 }

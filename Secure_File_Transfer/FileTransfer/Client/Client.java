@@ -15,7 +15,7 @@ public class Client {
             in = new DataInputStream(Client.getInputStream());
             out = new DataOutputStream(Client.getOutputStream());
             System.out.println("Sending file to server");
-            sendFile("Z:\\Networks-Lab-Exercises\\Week2\\FileTransfer\\Client\\NewFile.txt");
+            sendFile("Z:\\Networks-Lab-Exercises\\Secure_File_Transfer\\FileTransfer\\Client\\NewFile.txt");
             in.close();
             in.close();
         } catch (Exception e) {
